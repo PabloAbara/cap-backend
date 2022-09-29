@@ -103,4 +103,39 @@ describe 'Resources API' do
       end
     end
   end
+
+  path '/api/resources/{id}/comments' do
+    get 'Returns a Resource info' do
+      tags 'Resources'
+      parameter name: :id, in: :path, type: :string
+      produces 'application/json'
+      operationId 'getResourceComments'
+
+      let(:id) { create(:resource).id }
+      let(:comment) { create(:resource_comment, resource_id: id, user:) }
+
+      response '200', 'Success' do
+        schema type: :array,
+               items: {
+                 type: :object,
+                 properties: {
+                   id: { type: :integer },
+                   username: { type: :string },
+                   content: { type: :string },
+                   created_at: { type: :string }
+                 }
+               }
+        run_test!
+      end
+
+      response '401', 'Unauthorized', skip_before: true do
+        run_test!
+      end
+
+      response '404', 'Resource not found' do
+        let(:id) { 'invalid' }
+        run_test!
+      end
+    end
+  end
 end

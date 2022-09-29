@@ -24,12 +24,18 @@ module Api
     end
 
     def comments
+      comments = Resource.find(params[:resource_id])
+                         .resource_comments
+                         .includes(:user)
+      comments_data = extract_comments_data(comments)
+      render json: comments_data
+    end
+
+    private
+
+    def extract_comments_data(comments)
       comments_data = []
-      resource_comments = Resource
-                                .find(params[:resource_id])
-                                .resource_comments
-                                .includes(:user)
-      resource_comments.each do |comment|
+      comments.each do |comment|
         comments_data << {
           id: comment.id,
           created_at: comment.created_at.strftime('%Y/%m/%d %H:%M:%S'),
@@ -37,7 +43,6 @@ module Api
           content: comment.content
         }
       end
-      render json: comments_data
     end
   end
 end
